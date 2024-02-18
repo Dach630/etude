@@ -1,0 +1,19 @@
+Cheng Daniel
+Romele Gaspard
+Groupe AO
+
+Pour compiler le fichier, mettez-vous dans le dossier contenant le code avec un terminal de commandes et entrez la commande "javac main.java" puis "java main".
+A partir de là, suivez les instructions données par le terminal afin de créer une fractale qui s'affichera sur une fenêtre,laquelle sera sauvegardée automatiquement dans le dossier.
+Pour accéder à la partie graphique du programme ajouter l'option -i à l'éxecution ("java main -i").
+Si vous tester la partie graphique, entrer les valeurs que vous voulez dans les différentes cases de la fenêtre qui s'ouvre lors du lancement du programme.
+Attention, dans la partie console si vous voulez entrer un nombre à virgule, utiliser ",", mais dans la partie graphique utiliser ".".
+Pour la partie graphique, la valeur par défaut des sliders permet un visionnage optimal de la fractale.
+L'un des points forts de ce code sont la sécurité du programme, qui fait en sorte que l'utilisateur ne peut pas modifier les valeurs une fois entrées et ne peut pas entrer de valeur de mauvais type.
+Un second point fort est l'utilisation des bonnes bibiliothèques, en effet toutes les bibliothèques appellées dans le code sont nécessaires et utilisées de manière efficace, permettant un meilleur fonctionnement du programme.
+De plus, dans la version graphique du programme, lorsque l'utilisateur fait une erreur, on lui indique la cause de l'erreur.
+
+Sources : 
+https://fr.wikipedia.org/wiki/Ensemble_de_Julia
+https://mathcurve.com/fractals/julia/julia.shtml
+https://rosettacode.org/wiki/Julia_set
+https://rosettacode.org/wiki/Mandelbrot_set

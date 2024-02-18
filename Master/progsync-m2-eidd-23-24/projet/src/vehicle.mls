@@ -1,0 +1,180 @@
+open Globals
+open Utilities
+type st_1 = St_1_Positioning|St_1_On
+type st = St_Stopped|St_Running|St_Preparing|St_Arrived
+node car_geometry(phase : Globals.phase; vec : float^2)
+returns (newpos : Globals.position; newphase : Globals.phase)
+var v : float^2; v_1 : float^2^2; v_2 : float^2; v_3 : float^2;
+let
+  newpos = Utilities.vec2pos(v_3);
+  v_3 = Utilities.vec_add2(v, v_2);
+  v_2 = Utilities.mat_vec_prod2(v_1, vec);
+  v_1 = Utilities.mat_rot(phase.Globals.ph_head);
+  v = Utilities.pos2vec(phase.Globals.ph_pos);
+  newphase = {phase with .Globals.ph_pos = newpos}
+tel
+
+node driver(top : bool; sens : Globals.sensors; itr : Globals.interrupt;
+             iti : Globals.itielts)
+returns (rspeed : Globals.wheels; sta : Globals.status)
+var pnr : bool; nr : bool; r : bool; ns : st; ck : st;
+    rspeed_St_Preparing : Globals.wheels; sta_St_Preparing : Globals.status;
+    ns_St_Preparing : st; nr_St_Preparing : bool;
+    rspeed_St_Running : Globals.wheels; sta_St_Running : Globals.status;
+    ns_St_Running : st; nr_St_Running : bool;
+    rspeed_St_Arrived : Globals.wheels; sta_St_Arrived : Globals.status;
+    ns_St_Arrived : st; nr_St_Arrived : bool;
+    rspeed_St_Stopped : Globals.wheels; sta_St_Stopped : Globals.status;
+    ns_St_Stopped : st; nr_St_Stopped : bool; arriving : bool; r_1 : bool;
+    v : bool; v_4 : st; v_5 : bool;
+let
+  r = pnr;
+  pnr = false fby nr;
+  ck = St_Preparing fby ns;
+  sta_St_Preparing = Globals.Preparing;
+  rspeed_St_Preparing = Globals.idlew;
+  nr_St_Preparing = if (top when St_Preparing(ck)) then true else false;
+  ns_St_Preparing =
+    if (top when St_Preparing(ck)) then St_Running else St_Preparing;
+  sta_St_Running = Globals.Running;
+  (rspeed_St_Running, arriving) =
+    Control.controller((sens when St_Running(ck)), (iti when St_Running(ck)))
+       every r_1;
+  nr_St_Running = if arriving then true else v_5;
+  ns_St_Running = if arriving then St_Arrived else v_4;
+  v_5 = if v then true else false;
+  v_4 = if v then St_Stopped else St_Running;
+  v = ((itr when St_Running(ck)) = Globals.Halt);
+  r_1 = (r when St_Running(ck));
+  sta_St_Arrived = Globals.Arrived;
+  rspeed_St_Arrived = Globals.idlew;
+  nr_St_Arrived = false;
+  ns_St_Arrived = St_Arrived;
+  sta_St_Stopped = Globals.Stopped;
+  rspeed_St_Stopped = Globals.idlew;
+  nr_St_Stopped = false;
+  ns_St_Stopped = St_Stopped;
+  rspeed =
+    merge ck
+      (St_Stopped -> rspeed_St_Stopped)(St_Arrived -> rspeed_St_Arrived)
+      (St_Running -> rspeed_St_Running)(St_Preparing -> rspeed_St_Preparing);
+  sta =
+    merge ck
+      (St_Stopped -> sta_St_Stopped)(St_Arrived -> sta_St_Arrived)
+      (St_Running -> sta_St_Running)(St_Preparing -> sta_St_Preparing);
+  ns =
+    merge ck
+      (St_Stopped -> ns_St_Stopped)(St_Arrived -> ns_St_Arrived)
+      (St_Running -> ns_St_Running)(St_Preparing -> ns_St_Preparing);
+  nr =
+    merge ck
+      (St_Stopped -> nr_St_Stopped)(St_Arrived -> nr_St_Arrived)
+      (St_Running -> nr_St_Running)(St_Preparing -> nr_St_Preparing)
+tel
+
+node physical_model(top : bool; rspeed : Globals.wheels;
+                     ini_ph : Globals.phase)
+returns (ph : Globals.phase)
+var y0 : float; x0 : float; alpha0 : float; alpha0_1 : float; x0_1 : float;
+    y0_1 : float; pnr : bool; nr : bool; r : bool; ns : st_1; ck : st_1;
+    ph_St_1_Positioning : Globals.phase; alpha0_St_1_Positioning : float;
+    x0_St_1_Positioning : float; y0_St_1_Positioning : float;
+    ns_St_1_Positioning : st_1; nr_St_1_Positioning : bool;
+    ph_St_1_On : Globals.phase; alpha0_St_1_On : float; x0_St_1_On : float;
+    y0_St_1_On : float; ns_St_1_On : st_1; nr_St_1_On : bool;
+    pos : Globals.position; dummy : Globals.phase; v_24 : float^2;
+    dummy_1 : Globals.position; v : float; vR : float; vL : float;
+    alpha : float; co : float; si : float; r_2 : bool; r_3 : bool;
+    r_4 : bool; v_6 : float; v_7 : float; v_8 : float; v_9 : float;
+    v_10 : float; v_11 : float; v_12 : float; v_13 : float; v_14 : float;
+    v_15 : float; v_16 : float; v_17 : float; v_18 : float; v_19 : float;
+    v_20 : float; v_21 : Globals.position; v_22 : Globals.phase;
+    v_23 : float^2;
+let
+  y0_1 = pre y0;
+  x0_1 = pre x0;
+  alpha0_1 = pre alpha0;
+  r = pnr;
+  pnr = false fby nr;
+  ck = St_1_Positioning fby ns;
+  ph_St_1_Positioning =
+    {(ini_ph when St_1_Positioning(ck)) with .Globals.ph_vel = 0.000000};
+  alpha0_St_1_Positioning =
+    (ini_ph when St_1_Positioning(ck)).Globals.ph_head;
+  y0_St_1_Positioning = pos.Globals.y;
+  x0_St_1_Positioning = pos.Globals.x;
+  (pos, dummy) = car_geometry((ini_ph when St_1_Positioning(ck)), v_24);
+  v_24 = [~-.(Globals.cDELTA), 0.000000];
+  nr_St_1_Positioning =
+    if (top when St_1_Positioning(ck)) then true else false;
+  ns_St_1_Positioning =
+    if (top when St_1_Positioning(ck)) then St_1_On else St_1_Positioning;
+  y0_St_1_On = (y0_1 when St_1_On(ck));
+  x0_St_1_On = (x0_1 when St_1_On(ck));
+  alpha0_St_1_On = (alpha0_1 when St_1_On(ck));
+  (dummy_1, ph_St_1_On) = car_geometry(v_22, v_23);
+  v_23 = [Globals.cDELTA, 0.000000];
+  v_22 =
+    { Globals.ph_pos = v_21; Globals.ph_vel = v; Globals.ph_head = alpha };
+  v_21 = { Globals.x = v_18; Globals.y = v_20 };
+  v_20 =
+    Utilities.integrator(v_19, Globals.timestep, (y0 when St_1_On(ck)))
+       every r_4;
+  v_19 = (v *. si);
+  v_18 =
+    Utilities.integrator(v_17, Globals.timestep, (x0 when St_1_On(ck)))
+       every r_3;
+  v_17 = (v *. co);
+  alpha = Utilities.normalize(v_16);
+  v_16 =
+    Utilities.integrator(v_15, Globals.timestep, (alpha0 when St_1_On(ck)))
+       every r_2;
+  v_15 = (v_14 /. (Globals.pi *. Globals.cB));
+  v_14 = (v_13 *. 180.000000);
+  v_13 = (vR -. vL);
+  v = (v_12 /. 2.000000);
+  v_12 = (vL +. vR);
+  vR = (v_11 *. ((Globals.pi *. Globals.cD) /. 360.000000));
+  v_11 =
+    Utilities.bound
+    ((rspeed when St_1_On(ck)).Globals.right, Globals.cMAXWHEEL);
+  vL = (v_10 *. ((Globals.pi *. Globals.cD) /. 360.000000));
+  v_10 =
+    Utilities.bound
+    ((rspeed when St_1_On(ck)).Globals.left, Globals.cMAXWHEEL);
+  co = Mathext.cos(v_9);
+  v_9 = (v_8 /. 180.000000);
+  v_8 = (alpha *. Globals.pi);
+  si = Mathext.sin(v_7);
+  v_7 = (v_6 /. 180.000000);
+  v_6 = (alpha *. Globals.pi);
+  nr_St_1_On = false;
+  ns_St_1_On = St_1_On;
+  r_2 = (r when St_1_On(ck));
+  r_3 = (r when St_1_On(ck));
+  r_4 = (r when St_1_On(ck));
+  ph =
+    merge ck (St_1_On -> ph_St_1_On)(St_1_Positioning -> ph_St_1_Positioning);
+  alpha0 =
+    merge ck
+      (St_1_On -> alpha0_St_1_On)
+      (St_1_Positioning -> alpha0_St_1_Positioning);
+  x0 =
+    merge ck (St_1_On -> x0_St_1_On)(St_1_Positioning -> x0_St_1_Positioning);
+  y0 =
+    merge ck (St_1_On -> y0_St_1_On)(St_1_Positioning -> y0_St_1_Positioning);
+  ns =
+    merge ck (St_1_On -> ns_St_1_On)(St_1_Positioning -> ns_St_1_Positioning);
+  nr =
+    merge ck (St_1_On -> nr_St_1_On)(St_1_Positioning -> nr_St_1_Positioning)
+tel
+
+node simulate(iti : Globals.itielts; sens : Globals.sensors;
+               itr : Globals.interrupt; ini_ph : Globals.phase; top : bool)
+returns (ph : Globals.phase; sta : Globals.status)
+var rspeed : Globals.wheels;
+let
+  ph = physical_model(top, rspeed, ini_ph);
+  (rspeed, sta) = driver(top, sens, itr, iti)
+tel
+

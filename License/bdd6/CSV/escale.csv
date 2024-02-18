@@ -1,0 +1,8 @@
+id_escale,port_depart,port_arrive,date_depart,id_navire,nom_port,passagers_descendus,passagers_montes,produits_vendus,produits_achetes
+1, Port de Shanghai, Port du Havre, 2022-12-30, 1, Port de Richards Bay, 10, 10, 0, 2
+2, Port de Chiba, Port de Marseille, 2022-11-22, 4, Port de Richards Bay, 5, 10, 2, 0
+3, Port de Chiba, Port de Marseille, 2022-11-22, 4, Port de Valence, 15, 10, 5, 0
+4, Port de New York, Port de Bremerhaven, 2022-12-31, 6, Port de Valence, 10, 10, 5, 0
+5, Port de Shanghai, Port de Bremerhaven, 2022-12-31, 1, Port de Richards Bay', 10, 5, 2, 0
+6, Port de Shanghai, Port de Bremerhaven, 2022-12-31, 1, Port de Valence, 10, 5, 4, 0
+7, Port de Shanghai, Port de Bremerhaven, 2022-12-31, 1, Port du Havre, 10, 15, 6, 0

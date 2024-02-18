@@ -1,0 +1,5 @@
+# dune init proj ZeldaServeur
+# OCAMLPARAM: unset
+# Shared cache: disabled
+# Workspace root: /home/gaspard/Bureau/cheng-romele-plong-2022/ZeldaServeur
+# Auto-detected concurrency: 4

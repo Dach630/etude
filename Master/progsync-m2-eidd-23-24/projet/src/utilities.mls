@@ -1,0 +1,327 @@
+open Globals
+node min_float(a : float; b : float) returns (o : float)
+var v : bool;
+let
+  o = if v then a else b;
+  v = (a <. b)
+tel
+
+node min_int(a : int; b : int) returns (o : int)
+var v : bool;
+let
+  o = if v then a else b;
+  v = (a < b)
+tel
+
+node max_float(a : float; b : float) returns (o : float)
+var v : bool;
+let
+  o = if v then b else a;
+  v = (a <. b)
+tel
+
+node max_int(a : int; b : int) returns (o : int)
+var v : bool;
+let
+  o = if v then b else a;
+  v = (a < b)
+tel
+
+node countdown(e : bool; ini : int) returns (o : int)
+var mem : int; v : bool; v_1 : int; v_2 : int;
+let
+  o = (mem - v_2);
+  v_2 = if e then 1 else 0;
+  mem = if v then ini else v_1;
+  v_1 = pre o;
+  v = true fby false
+tel
+
+node angle_dist(from : Globals.position; to : Globals.position)
+returns (angle : float; dist : float)
+var v : float; v_3 : float; v_4 : float; v_5 : float; v_6 : float;
+    v_7 : float;
+let
+  angle = (v_7 /. Globals.pi);
+  v_7 = (v_6 *. 180.000000);
+  v_6 = Mathext.atan2(v_4, v_5);
+  v_5 = (to.Globals.x -. from.Globals.x);
+  v_4 = (to.Globals.y -. from.Globals.y);
+  dist = Mathext.hypot(v, v_3);
+  v_3 = (to.Globals.y -. from.Globals.y);
+  v = (to.Globals.x -. from.Globals.x)
+tel
+
+node bound(x : float; ceiling : float) returns (o : float)
+var v : float; v_8 : bool; v_9 : float; v_10 : bool; v_11 : float;
+let
+  o = if v_8 then v_9 else v_11;
+  v_11 = if v_10 then ceiling else x;
+  v_10 = (x >. ceiling);
+  v_9 = ~-.(ceiling);
+  v_8 = (x <. v);
+  v = ~-.(ceiling)
+tel
+
+node norm_color(a : Globals.color) returns (norm : float)
+var v : float; v_12 : float; v_13 : float; v_14 : float; v_15 : float;
+    v_16 : float; v_17 : float; v_18 : float; v_19 : float; v_20 : float;
+    v_21 : float;
+let
+  norm = Mathext.sqrt(v_21);
+  v_21 = (v_17 +. v_20);
+  v_20 = (v_18 *. v_19);
+  v_19 = Mathext.float(a.Globals.blue);
+  v_18 = Mathext.float(a.Globals.blue);
+  v_17 = (v_13 +. v_16);
+  v_16 = (v_14 *. v_15);
+  v_15 = Mathext.float(a.Globals.green);
+  v_14 = Mathext.float(a.Globals.green);
+  v_13 = (v *. v_12);
+  v_12 = Mathext.float(a.Globals.red);
+  v = Mathext.float(a.Globals.red)
+tel
+
+node compare_colors(a : Globals.color; b : Globals.color)
+returns (correlation : float)
+var v : float; v_22 : float; v_23 : float; v_24 : float; v_25 : float;
+    v_26 : float; v_27 : float; v_28 : float; v_29 : float; v_30 : float;
+    v_31 : float; v_32 : float; v_33 : float; v_34 : float;
+let
+  correlation = (v_31 /. v_34);
+  v_34 = (v_32 *. v_33);
+  v_33 = norm_color(b);
+  v_32 = norm_color(a);
+  v_31 = (v_27 +. v_30);
+  v_30 = (v_28 *. v_29);
+  v_29 = Mathext.float(b.Globals.blue);
+  v_28 = Mathext.float(a.Globals.blue);
+  v_27 = (v_23 +. v_26);
+  v_26 = (v_24 *. v_25);
+  v_25 = Mathext.float(b.Globals.green);
+  v_24 = Mathext.float(a.Globals.green);
+  v_23 = (v *. v_22);
+  v_22 = Mathext.float(b.Globals.red);
+  v = Mathext.float(a.Globals.red)
+tel
+
+node decode_color(a : Globals.color) returns (q : Globals.colorQ)
+var aa : float; gg : float; rr : float; v : bool; v_35 : bool; v_36 : bool;
+    v_37 : Globals.colorQ; v_38 : Globals.colorQ;
+let
+  q = if v then Globals.Red else v_38;
+  v_38 = if v_35 then Globals.Green else v_37;
+  v_37 = if v_36 then Globals.Amber else Globals.Other;
+  v_36 = (aa >. 0.850000);
+  v_35 = (gg >. 0.850000);
+  v = (rr >. 0.850000);
+  aa = compare_colors(a, Globals.amber);
+  gg = compare_colors(a, Globals.green);
+  rr = compare_colors(a, Globals.red)
+tel
+
+node encode_color(q : Globals.colorQ) returns (a : Globals.color)
+let
+  a =
+    merge q
+      (Globals.Red -> Globals.red)(Globals.Green -> Globals.green)
+      (Globals.Amber -> Globals.amber)(Globals.Other -> Globals.gray)
+tel
+
+node rising_edge(b : bool) returns (e : bool)
+var v : bool; v_39 : bool;
+let
+  e = (b & v_39);
+  v_39 = false fby v;
+  v = not(b)
+tel
+
+node falling_edge(b : bool) returns (e : bool)
+var v : bool; v_40 : bool; v_41 : bool;
+let
+  e = if v then false else v_41;
+  v_41 = rising_edge(v_40);
+  v_40 = not(b);
+  v = true fby false
+tel
+
+node after(ini : int) returns (o : bool)
+var n : int; v : bool; v_42 : int; v_43 : int; v_44 : int;
+let
+  o = (n = 0);
+  n = if v then ini else v_44;
+  v_44 = pre v_43;
+  v_43 = if o then n else v_42;
+  v_42 = (n - 1);
+  v = true fby false
+tel
+
+node event_edge(e : Globals.event) returns (o : Globals.event)
+var v : bool; v_45 : bool; v_46 : bool; v_47 : bool; v_48 : bool;
+let
+  o =
+    { Globals.lightRun = 
+      v;
+      Globals.speedExcess = 
+      v_45;
+      Globals.exitRoad = 
+      v_46;
+      Globals.collisionEvent = 
+      v_47;
+      Globals.dirEvent = 
+      v_48 };
+  v_48 = rising_edge(e.Globals.dirEvent);
+  v_47 = rising_edge(e.Globals.collisionEvent);
+  v_46 = rising_edge(e.Globals.exitRoad);
+  v_45 = rising_edge(e.Globals.speedExcess);
+  v = rising_edge(e.Globals.lightRun)
+tel
+
+node integrator(x : float; step : float; ini : float) returns (o : float)
+var s : float; v : bool; v_49 : float; v_50 : float; v_51 : float;
+    v_52 : float; v_53 : float; v_54 : float; v_55 : float; v_56 : float;
+let
+  o = (s -. v_56);
+  v_56 = (v_55 /. 2.000000);
+  v_55 = (step *. x);
+  s = (v_53 +. v_54);
+  v_54 = (step *. x);
+  v_53 = if v then v_51 else v_52;
+  v_52 = pre s;
+  v_51 = (ini -. v_50);
+  v_50 = (v_49 /. 2.000000);
+  v_49 = (step *. x);
+  v = true fby false
+tel
+
+node integrator_en(x : float; step : float; ini : float; en : bool)
+returns (o : float)
+var oi : float; v : bool; v_57 : float; v_58 : float;
+let
+  o = merge en (true -> oi)(false -> v_58);
+  v_58 = if v then (ini when false(en)) else (v_57 when false(en));
+  v_57 = pre o;
+  v = true fby false;
+  oi =
+    integrator((x when true(en)), (step when true(en)), (ini when true(en)))
+tel
+
+node derivative(x : float; step : float) returns (y : float)
+var v : float; v_59 : float;
+let
+  y = (v_59 /. step);
+  v_59 = (x -. v);
+  v = 0.000000 fby x
+tel
+
+node lowpass(x : float; a : float) returns (y : float)
+var v : float; v_60 : float; v_61 : float; v_62 : float;
+let
+  y = (v +. v_62);
+  v_62 = (v_60 *. v_61);
+  v_61 = 0.000000 fby y;
+  v_60 = (1.000000 -. a);
+  v = (a *. x)
+tel
+
+node normalize(angle : float) returns (normal : float)
+var v : float; v_63 : float; v_64 : float; v_65 : float;
+let
+  normal = (angle -. v_65);
+  v_65 = (360.000000 *. v_64);
+  v_64 = Mathext.floor(v_63);
+  v_63 = (v /. 360.000000);
+  v = (angle +. 180.000000)
+tel
+
+node pos2vec(pos : Globals.position) returns (vec : float^2)
+let
+  vec = [pos.Globals.x; pos.Globals.y]
+tel
+
+node vec2pos(vec : float^2) returns (pos : Globals.position)
+var v : float; v_66 : float;
+let
+  pos = { Globals.x = v; Globals.y = v_66 };
+  v_66 = vec[1];
+  v = vec[0]
+tel
+
+node mat_rot(alpha : float) returns (res : float^2^2)
+var co : float; si : float; v : float; v_67 : float; v_68 : float;
+    v_69 : float^2; v_70 : float; v_71 : float^2;
+let
+  res = [v_69; v_71];
+  v_71 = [v_70; co];
+  v_70 = ~-.(si);
+  v_69 = [co; v_68];
+  v_68 = ~-.(si);
+  co = Mathext.cos(v_67);
+  v_67 = (alpha *. (Globals.pi /. 180.000000));
+  si = Mathext.sin(v);
+  v = (alpha *. (Globals.pi /. 180.000000))
+tel
+
+node vec_add<<n:int>>(v1 : float^n; v2 : float^n) returns (o : float^n)
+let
+  o = (map ((+.)())<<n>>)(())(v1, v2)
+tel
+
+node vec_prod<<n:int>>(v1 : float^n; v2 : float^n) returns (o : float^n)
+let
+  o = (map ((*.)())<<n>>)(())(v1, v2)
+tel
+
+node dotp<<n:int>>(v1 : float^n; v2 : float^n) returns (o : float)
+var v : float^n;
+let
+  o = (fold ((+.)())<<n>>)(())(v, 0.000000);
+  v = vec_prod<<n>>(v1, v2)
+tel
+
+node mat_vec_prod<<n:int>>(mat : float^n^n; vec : float^n)
+returns (o : float^n)
+var v : float^n^n;
+let
+  o = (map (dotp<<n>>())<<n>>)(())(mat, v);
+  v = vec^n
+tel
+
+node vec_add2(v1 : float^2; v2 : float^2) returns (o : float^2)
+let
+  o = vec_add<<2>>(v1, v2)
+tel
+
+node mat_vec_prod2(mat : float^2^2; vec : float^2) returns (o : float^2)
+let
+  o = mat_vec_prod<<2>>(mat, vec)
+tel
+
+node abs(x : float) returns (o : float)
+var v : bool; v_72 : float;
+let
+  o = if v then v_72 else x;
+  v_72 = ~-.(x);
+  v = (x <. 0.000000)
+tel
+
+node uptime(x : float; step : float) returns (t : float)
+var v : float; v_73 : bool; v_74 : float;
+let
+  t = integrator(v_74, step, 0.000000);
+  v_74 = if v_73 then 1.000000 else 0.000000;
+  v_73 = (v >=. 1.000000);
+  v = abs(x)
+tel
+
+node variation(enabled : bool; x : float; step : float) returns (o : float)
+var v : float; v_75 : float; v_76 : float; v_77 : float; v_78 : float;
+let
+  o = integrator_en(v_78, step, 0.000000, enabled);
+  v_78 = abs(v_77);
+  v_77 = (v_76 /. step);
+  v_76 = normalize(v_75);
+  v_75 = (x -. v);
+  v = 0.000000 fby x
+tel
+

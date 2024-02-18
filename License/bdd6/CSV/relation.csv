@@ -1,0 +1,40 @@
+pays1,pays2,relation
+Chine, Japon, 3
+Japon, Chine, 3
+Chine, Corée du Sud, 2
+Corée du Sud, Chine, 2
+Corée du Sud, Japon, 2
+Japon, Corée du Sud, 2
+Chine, Etats-Unis, 3
+Etats-Unis, Chine, 3
+France, Japon, 1
+Japon, France, 1
+Etats-Unis, Cuba, 4
+Cuba, Etats-Unis, 4
+Canada, Etats-Unis, 2
+Etats-Unis, Canada, 2
+Canada, France, 1
+France, Canada, 1
+Royaume-Uni, Etats-Unis, 3
+Etats-Unis, Royaume-Uni, 3
+Royaume-Uni, France, 2
+France, Royaume-Uni, 2
+Pologne, Allemagne, 3
+Allemagne, Pologne, 3
+Allemagne, France, 2
+France, Allemagne, 2
+Chine, Inde, 3
+Inde, Chine, 3
+Chine, Russie, 2
+Russie, Chine, 2
+Chine, France, 2
+France, Chine, 2
+Etats-Unis, Mexique, 4
+Mexique, Etats-Unis, 4
+Etats-Unis, Japon, 2
+Argentine, Japon, 2
+Chine, Argentine, 2
+Argentine, Mexique, 2
+Mexique, Argentine, 2
+Espagne, France, 1
+France, Espagne, 1

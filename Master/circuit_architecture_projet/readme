@@ -1,0 +1,17 @@
+M1
+CHENG Daniel 
+ROMELE Gaspard
+
+Commandes à effectuer dans le dossier lc3 : 
+./lc3as Renduv2.asm
+./lc3sim RenduV2.obj
+./lc3as bin2graySCAN.asm
+./lc3sim bin2graySCAN.obj
+./lc3as gray2bin.asm
+./lc3sim gray2bin.obj
+./lc3as gray2binSCAN.asm
+./lc3sim gray2binSCAN.obj
+
+Toutes les fonctions de manipulations de texte sont dans RenduV2.asm.
+Quand vous lancez lc3sim avec RenduV2.obj, faites la commande "finish" pour afficher le résultat d'index et rindex. Le résultat de strcpy peut ensuite être vérifié en faisant la commande "dump strcpy".
+Pour strcmp et strncpy, il faudra faitre une seconde fois "finish", puis "dump strncpy". Attention si vous souhaitez tester strncpy, il faudra d'abord mettre l'appel à la fonction strcpy à la ligne 17 en commentaire pour avoir le résultat attendu.

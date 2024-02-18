@@ -1,0 +1,90 @@
+                      Mini-projet 1 : solveur DPLL récursif
+                             fichier RENDU
+                       (à remplir obligatoirement)
+
+**Un mini-projet sans fichier RENDU rempli ne recevra pas de note.**
+
+Date limite: 29 octobre 2021, 23h59
+
+Identité
+--------
+Nombre de binôme: 55
+Nom, prénom 1: NODIN Aurélie 
+Nom, prénom 2: CHENG Daniel
+
+
+Questions sur votre code
+------------------------
+0. Avez-vous testé que `make dpll` s'exécute sans erreurs ou warnings,
+   et que ensuite `./dpll sudoku-4x4.cnf` donne la réponse attendue (voir
+   fichier README) ?
+
+Oui, il marche sans erreurs et warnings car nous avons tout installé notamment findlib.  Oui nous avons la même chose.
+
+---
+
+1. Avez-vous utilisé la fonction `filter_map` (donné dans dpll.ml)
+   dans votre implémentation de `simplifie` ? 
+   - Si oui, expliquez en quelques phrases en français comment vous
+     l'avez utilisée.
+   - Si non, expliquez en quelques phrases en français comment
+     fonctionne votre implémentation de `simplifie`.
+
+Oui nous avons utiliser filter_map. Simplifie appelle filter_map avec comme argument la fonction filtre (qui prend elle-même en argument un int ( le literral )) et une int list list, les clauses.
+C'est tout ce que fait simplifie, le plus gros du travail est dans notre fonction filtre.  La fonction filtre est récursive terminale, elle vérifie si la liste passée en argument contient ou pas le littéral, si oui, elle renvoie None, si non, elle fait une autre verification ; Si la liste contient la negation du literral, elle renvoie la liste sans la negation sinon elle renvoie la liste telle quelle. En appelant filter_map sur les clauses, toutes les clauses passent par la fonction filtre donc on obtient une nouvelle liste avec les clauses simplifié avec un littéral i passé à vrai.
+
+---
+
+2. Pour l'implémentation de `unitaire`, quelles sont les fonctions
+   auxiliaires que vous avez utilisées et/ou écrites ? (Par une
+   fonction auxiliaire, on entend ici soit une fonction d'une
+   bibliothèque, par exemple des fonctions comme `List.length`,
+   `List.rev_append`, ou une fonction `aux_unitaire` que vous avez
+   écrite vous-mêmes.) Expliquez en quelques phrases en français
+   comment ces fonctions auxiliaires sont utilisées dans votre
+   implémentation de la fonction `unitaire`.
+
+Il n'est pas nécessaire d'utiliser des fonctions auxiliaire ici.
+On a juste besoin de de voir si il y a une clause de taille 1. 
+
+---
+
+3. Pour l'implémentation de `pur`, quelles sont les fonctions
+   auxiliaires que vous avez utilisées et/ou écrites ?  Expliquez en
+   quelques phrases en français comment ces fonctions auxiliaires sont
+   utilisées dans votre implémentation de la fonction `pur`.
+
+Pour l'implémentation de pur il y a beaucoup de fonctions auxiliaires.
+Flat est utiliser pour transformer une liste de liste en une liste sans conserver l'ordre, la list sera utiliser pour sort.
+Insert ajoute un élément dans une liste de façon à rendre une liste croissante sans doublon et utilise List.rev_append sur la liste créé et la liste des éléments restants de la liste original.
+Sort utilise la fonction insert pour créer une liste croissante sans doublon des propositions des clausses  et qui sera utilisée dans pure.
+Les 3 fonctions sont la pour reduire le nombre de comparaison inutile.
+Contains sert à voir si un élément est dans la liste.
+Pure utilise la liste (l) donner par sort et de sa taille (n) , il cherche la négation du 1er élément de l dans l
+et à chaque appel le 1er élément de l va a sa fin et n diminue de 1,si il trouve une proposition pure alors elle le renvoie,
+si n <= 0 alors il n'y a pas de proposition pur.
+
+---
+
+4. Donnez un exemple d'une formule pour laquelle les deux fonctions
+   `solveur_split` et `solveur_dpll_rec` ont un comportement
+   différent, et expliquez les différences entre ces deux fonctions.
+
+[[3,4,2,1], [2,1] , [5,6], [-2,1], [-3], [-5]]
+Avec solveur_dpll, la fonction unitaire va être utiliser dès le " premier tour " pour le -3, -5 et 6 ( le 6 va devenir unitaire grâce à la simplification du -5)  ce qui va éliminer 3 clauses et nous allons se retrouver avec 3 clauses qui contienne un littéral pur 1; Donc nous pouvons utiliser la fonction pur et terminer directement.Cela fait 4 etapes.
+Avec solveur_split, c'est beaucoup plus long, nous avons au moins 6 étapes car le solveur split va chercher " dans l'ordre " et commencer par le 3 puis 4 etc avant de se rendre compte qu'il y a des clauses unitaires et un littéral pur. ( Les etapes sont  : 3 4 2 5 6 1 ).
+
+Cette exemple est montre une différence assez négligeable à cette échelle, mais plus la formule est longue et compliquée, plus la différence va se creuser et ne va plus devenir négligeable.
+
+
+**à remplir**
+
+---
+
+5. Avez-vous d'autres remarques sur votre rendu ? (question optionnelle)
+
+**à remplir**
+
+---
+
+--fin du fichier RENDU--

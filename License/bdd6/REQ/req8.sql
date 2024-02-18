@@ -1,0 +1,1 @@
+SELECT COUNT(nom) AS nb_produit FROM produit;

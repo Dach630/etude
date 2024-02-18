@@ -1,0 +1,30 @@
+open Globals
+node the_challenge(initial_ph : Globals.phase; top : bool)
+returns (ph : Globals.phase; sta : Globals.status; sign : Globals.sign;
+          evt : Globals.event; scoreA : int; scoreB : int; time : float)
+var sens : Globals.sensors; ini_sens : Globals.sensors;
+    itr : Globals.interrupt; v : Globals.itielts; v_1 : bool;
+    v_2 : Globals.sensors; v_3 : Globals.sensors; v_4 : Globals.interrupt;
+    v_5 : Globals.event;
+let
+  scoreB = City.scoringB(ph);
+  time = City.wallclock(sta);
+  scoreA = City.scoringA(evt, sta);
+  () = Map.soundEffects(v_5, sta);
+  v_5 = Utilities.event_edge(evt);
+  (sign, itr, sens, evt) = City.simulate(ph, time);
+  (ph, sta) = Vehicle.simulate(v, v_3, v_4, initial_ph, top);
+  v_4 = Globals.Ok fby itr;
+  v_3 = if v_1 then ini_sens else v_2;
+  v_2 = pre sens;
+  v_1 = true fby false;
+  v = Map.read_itinerary();
+  ini_sens =
+    { Globals.s_road = 
+      { Globals.red = 128; Globals.green = 128; Globals.blue = 128 };
+      Globals.s_front = 
+      { Globals.red = 128; Globals.green = 128; Globals.blue = 128 };
+      Globals.s_sonar = 
+      Globals.cSONARFAR }
+tel
+

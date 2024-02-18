@@ -1,0 +1,11 @@
+Ce projet est un devoir réalisé pour le cours Langages à Objets Avancés 
+en première année de Master. Nous devions créér trois jeux de sociétés 
+différents.
+Pour compiler le projet, lancer la commande "make".
+La commande pour exécuter est "./main".
+Une fois le programme lancé, suivez les instructions du terminal.
+Seul le jeu Trax est complétement fonctionnel.
+
+Le jeu Domino manque le deroulement du jeu et l'affichage.
+Le jeu Carcassonne manque le deroulement jeu et son affichage
+

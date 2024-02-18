@@ -1,0 +1,36 @@
+automate → declarations transitions
+declarations → inputsymbols stacksymbols states initialstate initialstack
+inputsymbols → input symbols: suitelettres-nonvide
+stacksymbols → stack symbols: suitelettres-nonvide
+states → states: suitelettres-nonvide
+initialstate → initial state: lettre
+initialstack → initial stack symbol: lettre
+suitelettres-nonvide → lettre | lettre , suitelettres-nonvide
+lettre-ou-vide → [] | lettre
+stack → [] | nonemptystack
+nonemptystack → lettre | lettre ; nonemptystack
+lettre → [0-9a-zA-Z]
+
+
+case -> case 
+top -> top of 
+next -> next of 
+statof -> state of 
+action -> push | change | pop| reject
+begin -> : begin case
+push -> : push letter
+pop -> : pop
+reject -> : reject
+change -> : change letter
+end -> end
+
+transitions → program: translist end
+translist → case state  stateTrans
+stateTrans → lettre begin case multicase | []
+multicase -> top multitrans | next multitrans
+multitrans -> multitrans001 | multitrans002
+multitrans001 -> trans001 multitrans001 | end
+trans001 -> lettre action 
+
+multitrans002 -> trans002 multitrans002 | end
+trans002 -> lettre begin case letter action end

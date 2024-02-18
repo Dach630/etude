@@ -1,0 +1,326 @@
+open Globals
+open Utilities
+node wallclock(rstatus : Globals.status) returns (time : float)
+var cpt : int; v : bool; v_1 : int; v_2 : int; v_3 : float;
+let
+  time = (Globals.timestep *. v_3);
+  v_3 = Mathext.float(cpt);
+  cpt = (v_1 + v_2);
+  v_2 = 0 fby cpt;
+  v_1 = if v then 1 else 0;
+  v = (rstatus = Globals.Running)
+tel
+
+node lookup_phase(ph : Globals.phase) returns (data : Globals.map_data)
+let
+  data = Map.lookup_pos(ph.Globals.ph_pos)
+tel
+
+node light(lights : Globals.traflights; ph : Globals.phase)
+returns (light_run : bool)
+var data : Globals.map_data; v : bool; v_4 : bool; v_5 : Globals.traflight;
+    v_6 : bool;
+let
+  light_run = (v_4 & v_6);
+  v_6 = (v_5.Globals.tl_color = Globals.Red);
+  v_5 = lights[>data.Globals.tl_number<];
+  v_4 = (v & data.Globals.tl_required);
+  v = (ph.Globals.ph_vel >. 0.010000);
+  data = lookup_phase(ph)
+tel
+
+node speed(ph : Globals.phase) returns (speed_excess : bool)
+var v : Globals.map_data; v_7 : float;
+let
+  speed_excess = (ph.Globals.ph_vel >. v_7);
+  v_7 = Mathext.float(v.Globals.max_speed);
+  v = lookup_phase(ph)
+tel
+
+node exited_aux(pos : Globals.position; acc : bool) returns (accnew : bool)
+var v : Globals.map_data;
+let
+  accnew = (acc & v.Globals.on_road);
+  v = Map.lookup_pos(pos)
+tel
+
+node exited(ph : Globals.phase) returns (exit_road : bool)
+var dummy : Globals.phase^2; positions : Globals.position^2;
+    v : Globals.phase^2; v_8 : float^2^2; v_9 : bool;
+let
+  exit_road = not(v_9);
+  v_9 = (fold (exited_aux())<<2>>)(())(positions, true);
+  (positions, dummy) = (map (Vehicle.car_geometry())<<2>>)(())(v, v_8);
+  v_8 =
+    [[~-.(Globals.cDELTA), (Globals.cB /. 2.000000)],
+      [~-.(Globals.cDELTA), (~-.(Globals.cB) /. 2.000000)]];
+  v = ph^2
+tel
+
+node collision_aux(ph : Globals.phase; obst : Globals.obstacle; acc : bool)
+returns (accnew : bool)
+var close : bool; distobst : float; dist : float; angle : float; ang : float;
+    v : float; v_10 : float; v_11 : float; v_12 : bool; v_13 : bool;
+    v_14 : bool; v_15 : float; v_16 : float; v_17 : bool; v_18 : float;
+    v_19 : float; v_20 : bool; v_21 : bool; v_22 : float; v_23 : float;
+    v_24 : bool;
+let
+  close = (v_21 & v_24);
+  v_24 = (v_23 >=. ~-.(Globals.cSC));
+  v_23 = (v_22 *. distobst);
+  v_22 = Mathext.cos(angle);
+  v_21 = (v_17 & v_20);
+  v_20 = (v_19 <=. Globals.cSA);
+  v_19 = (v_18 *. distobst);
+  v_18 = Mathext.cos(angle);
+  v_17 = (v_16 <=. Globals.cSB);
+  v_16 = (v_15 *. distobst);
+  v_15 = Mathext.sin(angle);
+  distobst = (dist -. Globals.cROBST);
+  accnew = (acc or v_14);
+  v_14 = (obst.Globals.o_pres & v_13);
+  v_13 = (v_12 or close);
+  v_12 = (dist <=. Globals.cROBST);
+  angle = ((Globals.pi /. 180.000000) *. v_11);
+  v_11 = Utilities.abs(v_10);
+  v_10 = Utilities.normalize(v);
+  v = (ph.Globals.ph_head -. ang);
+  (ang, dist) = Utilities.angle_dist(ph.Globals.ph_pos, obst.Globals.o_pos)
+tel
+
+node collision(ph : Globals.phase; obstacles : Globals.obstacles)
+returns (collision_event : bool)
+var v : Globals.phase^Globals.obstnum;
+let
+  collision_event =
+    (fold (collision_aux())<<Globals.obstnum>>)(())(v, obstacles, false);
+  v = ph^Globals.obstnum
+tel
+
+node wrong_dir(ph : Globals.phase) returns (wrong : bool)
+var ang : float; error : float; data : Globals.map_data; v : float;
+    v_25 : float; v_26 : float; v_27 : float;
+let
+  wrong = (error <. ~-.(0.500000));
+  error = (v_25 +. v_27);
+  v_27 = (data.Globals.dir_y *. v_26);
+  v_26 = Mathext.sin(ang);
+  v_25 = (data.Globals.dir_x *. v);
+  v = Mathext.cos(ang);
+  ang = (ph.Globals.ph_head *. (Globals.pi /. 180.000000));
+  data = lookup_phase(ph)
+tel
+
+node aggregate_events(lightRun : bool; speedExcess : bool; exitRoad : bool;
+                       collisionEvent : bool; wrong : bool)
+returns (o : Globals.event; itr : Globals.interrupt)
+let
+  itr = if exitRoad then Globals.Halt else Globals.Ok;
+  o =
+    { Globals.lightRun = 
+      lightRun;
+      Globals.speedExcess = 
+      speedExcess;
+      Globals.exitRoad = 
+      exitRoad;
+      Globals.collisionEvent = 
+      collisionEvent;
+      Globals.dirEvent = 
+      wrong }
+tel
+
+node event_detection(sign : Globals.sign; ph : Globals.phase)
+returns (itr : Globals.interrupt; evts : Globals.event)
+var v : bool; v_28 : bool; v_29 : bool; v_30 : bool; v_31 : bool;
+let
+  (evts, itr) = aggregate_events(v, v_28, v_29, v_30, v_31);
+  v_31 = wrong_dir(ph);
+  v_30 = collision(ph, sign.Globals.si_obstacles);
+  v_29 = exited(ph);
+  v_28 = speed(ph);
+  v = light(sign.Globals.si_tlights, ph)
+tel
+
+node ground_color_detection(ph : Globals.phase)
+returns (road_color : Globals.color)
+var v : Globals.map_data;
+let
+  road_color = v.Globals.color;
+  v = lookup_phase(ph)
+tel
+
+node traffic_light_detection(ph : Globals.phase;
+                              traflights : Globals.traflights)
+returns (tlight_color : Globals.color)
+var v : Globals.traflight; v_32 : Globals.map_data; v_33 : Globals.traflight;
+let
+  tlight_color = Utilities.encode_color(v_33.Globals.tl_color);
+  v_33 = traflights[v_32.Globals.tl_number] default v;
+  v_32 = lookup_phase(ph);
+  v =
+    { Globals.tl_pos = 
+      { Globals.x = 0.000000; Globals.y = 0.000000 };
+      Globals.tl_color = 
+      Globals.Other }
+tel
+
+node obstacles_detection_aux(ph : Globals.phase; obst : Globals.obstacle;
+                              acc : int)
+returns (accnew : int)
+var sonar : int; d1 : float; d : float; a : float; v : float; v_34 : float;
+    v_35 : float; v_36 : bool; v_37 : bool; v_38 : bool; v_39 : bool;
+    v_40 : int;
+let
+  accnew = Utilities.min_int(sonar, acc);
+  sonar = if v_39 then v_40 else Globals.cSONARFAR;
+  v_40 = Mathext.int(d1);
+  v_39 = (v_38 & obst.Globals.o_pres);
+  v_38 = (v_36 & v_37);
+  v_37 = (d1 <=. 100.000000);
+  v_36 = (v_35 <=. 30.000000);
+  v_35 = Utilities.abs(v_34);
+  v_34 = Utilities.normalize(v);
+  v = (ph.Globals.ph_head -. a);
+  d1 = (d -. Globals.cROBST);
+  (a, d) = Utilities.angle_dist(ph.Globals.ph_pos, obst.Globals.o_pos)
+tel
+
+node obstacle_detection(ph : Globals.phase; obstacles : Globals.obstacles)
+returns (sonar : int)
+var v : Globals.phase^Globals.obstnum;
+let
+  sonar =
+    (fold (obstacles_detection_aux())<<Globals.obstnum>>)
+      (())(v, obstacles, Globals.cSONARFAR);
+  v = ph^Globals.obstnum
+tel
+
+node robot_sensors(ph : Globals.phase; sign : Globals.sign)
+returns (sens : Globals.sensors)
+var v : Globals.color; v_41 : Globals.color; v_42 : int;
+let
+  sens =
+    { Globals.s_road = v; Globals.s_front = v_41; Globals.s_sonar = v_42 };
+  v_42 = obstacle_detection(ph, sign.Globals.si_obstacles);
+  v_41 = traffic_light_detection(ph, sign.Globals.si_tlights);
+  v = ground_color_detection(ph)
+tel
+
+node traffic_lights_aux(p : Globals.param_tlight; time : float)
+returns (tl : Globals.traflight)
+var light : Globals.colorQ; period : int; cpt : int; v : int; v_43 : int;
+    v_44 : int; v_45 : int; ck : bool; light_true : Globals.colorQ;
+    light_false : Globals.colorQ; ck_1 : bool;
+    light_false_true : Globals.colorQ; light_false_false : Globals.colorQ;
+    v_46 : int;
+let
+  tl = { Globals.tl_pos = p.Globals.ptl_pos; Globals.tl_color = light };
+  ck = (cpt < p.Globals.ptl_green);
+  light_true = Globals.Green;
+  ck_1 = ((cpt when false(ck)) < v_46);
+  v_46 =
+    ((p when false(ck)).Globals.ptl_amber +
+     (p when false(ck)).Globals.ptl_green);
+  light_false_true = Globals.Amber;
+  light_false_false = Globals.Red;
+  light_false =
+    merge ck_1 (false -> light_false_false)(true -> light_false_true);
+  light = merge ck (false -> light_false)(true -> light_true);
+  cpt = Mathext.modulo(v_45, period);
+  v_45 = (v_44 + p.Globals.ptl_phase);
+  v_44 = Mathext.int(time);
+  period = Utilities.max_int(1, v_43);
+  v_43 = (v + p.Globals.ptl_red);
+  v = (p.Globals.ptl_amber + p.Globals.ptl_green)
+tel
+
+node traffic_lights(time : float) returns (all_lights : Globals.traflights)
+var lights : Globals.param_tlights; v : float^Globals.trafnum;
+let
+  all_lights = (map (traffic_lights_aux())<<Globals.trafnum>>)(())(lights, v);
+  v = time^Globals.trafnum;
+  lights = Map.read_traffic_lights()
+tel
+
+node all_obstacles_aux(po : Globals.param_obst; time : float)
+returns (o : Globals.obstacle)
+var v : bool; v_47 : bool; v_48 : bool;
+let
+  o = { Globals.o_pos = po.Globals.pot_pos; Globals.o_pres = v_48 };
+  v_48 = (v & v_47);
+  v_47 = (time <=. po.Globals.pot_till);
+  v = (po.Globals.pot_since <=. time)
+tel
+
+node all_obstacles(time : float) returns (obstacles : Globals.obstacles)
+var v : Globals.param_obsts; v_49 : float^Globals.obstnum;
+let
+  obstacles = (map (all_obstacles_aux())<<Globals.obstnum>>)(())(v, v_49);
+  v_49 = time^Globals.obstnum;
+  v = Map.read_obstacles()
+tel
+
+node simulate(ph : Globals.phase; time : float)
+returns (sign : Globals.sign; itr : Globals.interrupt;
+          sens : Globals.sensors; evt : Globals.event)
+var v : Globals.traflights; v_50 : Globals.obstacles;
+let
+  sens = robot_sensors(ph, sign);
+  (itr, evt) = event_detection(sign, ph);
+  sign = { Globals.si_tlights = v; Globals.si_obstacles = v_50 };
+  v_50 = all_obstacles(time);
+  v = traffic_lights(time)
+tel
+
+node scoringA(e : Globals.event; rstatus : Globals.status)
+returns (score : int)
+var collision_count : int; penalty : int; v : int; v_51 : bool; v_52 : bool;
+    v_53 : bool; v_54 : int; v_55 : int; v_56 : int; v_57 : bool; v_58 : int;
+    v_59 : bool; v_60 : int; v_61 : int; v_62 : int; v_63 : int; v_64 : bool;
+    v_65 : int; v_66 : int; v_67 : bool; v_68 : int; v_69 : int; v_70 : bool;
+    v_71 : int; v_72 : int; v_73 : bool; v_74 : int; v_75 : bool;
+let
+  collision_count = Utilities.countdown(v_75, 20);
+  v_75 = not(e.Globals.collisionEvent);
+  penalty = (v_72 + v_74);
+  v_74 = if v_73 then 10 else 0;
+  v_73 = (collision_count < 0);
+  v_72 = (v_69 + v_71);
+  v_71 = if v_70 then ~-(500) else 0;
+  v_70 = (collision_count = 0);
+  v_69 = (v_66 + v_68);
+  v_68 = if v_67 then ~-(2000) else 0;
+  v_67 = Utilities.rising_edge(e.Globals.dirEvent);
+  v_66 = (v_63 + v_65);
+  v_65 = if v_64 then ~-(5000) else 0;
+  v_64 = Utilities.rising_edge(e.Globals.exitRoad);
+  v_63 = (v_61 + v_62);
+  v_62 = if e.Globals.speedExcess then ~-(2) else 0;
+  v_61 = (v_58 + v_60);
+  v_60 = if v_59 then ~-(100) else 0;
+  v_59 = Utilities.rising_edge(e.Globals.speedExcess);
+  v_58 = if v_57 then ~-(500) else 0;
+  v_57 = Utilities.rising_edge(e.Globals.lightRun);
+  score = (v + v_56);
+  v_56 = if v_52 then 1000 else v_55;
+  v_55 = (0 + v_54);
+  v_54 = if v_53 then penalty else 0;
+  v_53 = (rstatus = Globals.Running);
+  v_52 = Utilities.rising_edge(v_51);
+  v_51 = (rstatus = Globals.Arrived);
+  v = 10000 fby score
+tel
+
+node scoringB(ph : Globals.phase) returns (score : int)
+var v : float; v_76 : bool; v_77 : float; v_78 : float; v_79 : float;
+    v_80 : float;
+let
+  score = Mathext.int(v_80);
+  v_80 = (1000.000000 -. v);
+  v = (v_77 /. v_79);
+  v_79 = (1.000000 +. v_78);
+  v_78 = Utilities.uptime(ph.Globals.ph_vel, Globals.timestep);
+  v_77 = Utilities.variation(v_76, ph.Globals.ph_head, Globals.timestep);
+  v_76 = (ph.Globals.ph_vel >=. 1.000000)
+tel
+

@@ -1,0 +1,35 @@
+#!/usr/bin/env bash
+
+set -e
+
+DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null 2>&1 && pwd )"/..
+DIR=`realpath $DIR`
+LC3AS=$DIR/lc3/lc3as
+
+if [[ ! -x $LC3AS ]]; then
+    echo "Could not find lc3as in $DIR" >&2
+    exit 1
+fi
+
+if [ $# = 0 ]; then
+    echo "Usage: $0 FILE.asm" >&2
+    exit 1
+fi
+
+BASE=`basename $1 .asm`
+
+if [ x$BASE = x$1 ]; then
+   echo "Input is not a .asm file!"
+   exit 1
+fi
+
+# run the real lc3-as
+$LC3AS "$@" || exit 1
+
+# create the derived .mem
+
+grep -q .ORIG $1 && echo "Warning: ignoring .ORIG for $BASE.mem"
+
+echo "v2.0 raw" > $BASE.mem
+hexdump -s2 -v -e '/1 "%02x" /1 "%02x "' $BASE.obj >> $BASE.mem
+echo >> $BASE.mem

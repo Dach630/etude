@@ -1,0 +1,21 @@
+nom, attribut, volume
+"bois de chêne", false, 20
+"bois de sapin", false, 30
+"PS5", false, 5
+"Xbox360", false, 4
+"tabouret", false, 9
+"chaise" , false, 9
+"imprimante", false,10
+"carte graphique",false, 1
+"ordinateur portable", false, 2
+"iphone 13" , false, 1
+"trotinet xiaomi", false,3
+"pantalon", false, 1
+true,
+,
+, true,
+"PSvita", false, 1
+, false, 
+"electroblast 2000" ,, 3
+"banane" , true,2
+"mange" , true,2

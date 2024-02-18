@@ -1,0 +1,86 @@
+-----
+17/11/2022
+
+Pagani: 
+    - ok comme projet mais etouffer un peu le sujet:
+        - decrire les enjeux d'implementer ce jeu en ocaml (par ex. bibliotheque graphique?, multiceur pour plusieurs entités?. librerie reaseaux pour jeu en ligne)
+        
+    - à revoir pour approvation definitive la semaine prochaine
+
+-----
+24/11/2022
+
+Degorre:
+   - graphiques -> LablGTK, réseau -> sockets du module OCaml UNIX
+   - multi-coeur pour entités -> en étant conscient que c'est pour découvrir le mécanisme, mais que ça ne correspond pas à la façon efficace habituelle de le faire (boucle d'évènements)
+   - réseau : serveur + clients ou bien client-serveur + client(s) ?
+   - comment on gère les problèmes de latence? Anticipation côté client?
+   - seulement  2 joueurs ou massivement multi-joueurs ? Passage à l'échelle ?
+   
+   -> OK pour commencer, mais prendre en compte les remarques ci-dessus pour une dernière version de la proposition de projet
+  
+<25/01/2023>
+FAIT : 
+- installé lablGTK (avec difficulté)
+- révision OCaml
+À FAIRE :
+- preuve de concept : interface graphique, montrer qu'il y a une connexion client/serveur, gestion clavier, etc.
+- réfléchir aux types utilisés (enregistrement)
+- utiliser le système de modules et les .mli pour travailler de manière indépendante. 
+
+<15/02/23>
+
+Degorre
+
+Fait :
+- client+serveur avec connexion (le serveur sort sur la console les touches appuyées sur le client)
+- lablGTK -> Graphics + CamlImages (raison : pas moyen d'afficher une image PNG)
+- IG où on peut déplacer un sprite au clavier
+- certains types définis pas encore utilisés
+
+À faire :
+- carte/terrain (structure de données ? stockage ? génération ?)
+- ennemis
+- statistiques
+- faire le point sur la structure du programme et les types
+- -> modules et mli ?
+
+<15/03/23>
+
+Degorre
+
+Fait :
+
+- ajout 2 types d'ennemi (l'un qui tourne à chaque mur, l'autre qui suit le joueur)
+- types joueur, ennemi, carte (en fait juste 1 écran)
+- joueurs et ennemi ont un nb de PV et un nb de points d'attaque
+- les ennemis peuvent attaquer le joueur (pas le contraire)
+- collisions
+
+
+À faire :
+- carte (tableau d'écrans ?)
+- ennemis (pouvoir les attaquer)
+- autres statistiques?
+- objets ?
+- faire le point sur la structure du programme et les types, modules et mli
+
+Il va être difficile de finir les objectifs de mars d'ici la fin du mois.
+Suggestion : déplacer l'objectif réseau à avril et se concentrer sur le reste d'abord.
+
+<19/04/23>
+Pagani:
+
+Fait:
+- carte comme array of ecrans, generé aleatoirement à partir d'un jeu de ecrans fait à la main
+- fait attaque ennemis (avec epée), à faire avec arc
+- ajouté des objets (coeur pour soigner, argent pour acheter des objets, mais pas implementer)
+- ennemeni qui suit le jouers est un peu buggé (à ameliorer l'algorithme)
+- partie graphique implementé avec graphics
+- pas fait partie reseau, dommage
+LOC : 400 + 45 + 260 + 81 + 165 + 
+
+
+À faire:
+- resoudre des bugs, par ex. attaque enfoncé le jouer ne se deplace pas, bug avec les objets, bug mort ennemi sur un plateu qui meurt sur tous les plateaux similaire
+- commenter le code, faire les .mli  pour une meulleure lisibilité de votre architecture

@@ -1,0 +1,61 @@
+CHENG Daniel 
+ROMELE Gaspard
+Zelda NES en OCaml
+
+## Introduction générale
+
+Ce travail est réalisé dans le cadre d'un cours de première année de master d'informatique,
+dont le but est de développer un projet sur une durée d'environ 6 mois.
+Nous avons choisi de recréer le jeu "The Legend of Zelda" sur NES, qui sera programmé en OCaml. 
+L'une des principales difficultés de ce projet est que nous n'avons jamais réalisé d'interface graphique en OCaml, la bibliothèque standard 
+du langage étant plutôt limitée dans cette situation. Il existe cependant une bibliothèque nommée LablGTK offrant un large choix de fonctions 
+pour le développement de GUI en OCaml. Nous apprendrons donc en parralèle à nous en servir afin de réaliser notre projet.
+Nous voudrions aussi donner aux utilisateurs la possibilité de jouer à plusieurs sur une même partie. Pour cela, quand un joueur crée une partie, 
+cela démarre un serveur auquel les joueurs se connecteront pour jouer. La biblothèque Unix offre quelques fonctions pour des projets en réseau, mais
+d'après nos recherches sur le sujet OCaml semble moins efficace pour cette tâche que d'autres langages plus communs.      
+
+## Objectifs
+
+Notre principal objectif est de programmer un jeu en temps réel dans un langage sans framework standard.
+Notre deuxième objectif est d'intégrer au jeu des fonctionnalités en réseau, via des sockets, afin de permettre à un maximum de quatre joueurs de jouer sur une 
+même partie.
+
+Une fois cette partie du projet terminé,nous pourrons tenter de mettre en place un système où la caméra suit le joueur en permanence, plutôt que de 
+passer d'écran en écran.
+Pour cela nous aurions un serveur pour chaque jeu qui transmet les images et le son et chaque joueur aurait un client. 
+Il serait aussi possible de donner au personnage jouable des déplacements en diagonale.
+Nous pourrons également développer un moyen pour un joueur de sauvegarder et de charger une partie.
+Enfin, nous pourrons réaliser une scène cinématique déclenchée par une action du joueur, tel que le fait d’avoir 
+vaincu le boss de fin.
+
+## Calendrier
+
+décembre :
+  -Faire un graphe qui est constamment mis à jour et dont l'une des valeurs se déplace selon les commandes du joueur via un thread.
+
+décembre-janvier :
+  -Faire une interface graphique pour le jeu, en se servant de l'interface GTK LablGTK.
+  -Commencer à développer des sockets clients et serveurs pour que le jeu puisse fonctionner en multijoueur.
+
+février-mars:
+  -Ajouter des ennemis qui se déplacent en temps réel, avec des patterns spécifiques à chacun.
+  -Assigner des statistiques (vitesse,points de vie,dégats,vitesse d'attaque...) au joueur et ennemis.
+  -Programmer des objets que le joueur peut utiliser et qui lui donnent accès à de nouvelles actions.
+  -Continuer à travailler l'aspect réseau du programme.
+
+avril-mai :
+  -Faire jouer différentes musiques selon l'environnement du jeu
+(niveaux,boss…).
+  -En cas de besoin, finaliser les parties de l'application qui ne 
+fonctionnent pas correctement.
+  -Optimiser notre code.
+  -Réaliser les objectifs secondaires selon le temps restant.
+  
+## Références
+-http://sdz.tdct.org/sdz/les-interfaces-graphiques-avec-ocaml.html
+-https://dev.realworldocaml.org/toc.html
+-https://caml.inria.fr/pub/docs/oreilly-book/html/book-ora124.html
+-https://marmelab.com/blog/2020/02/21/ocaml-and-opengl-in-practice.html
+-https://www.reddit.com/r/ocaml/comments/38awy2/is_ocaml_viable_for_game_development/
+-https://dev.to/sheosi/making-a-game-engine-with-ecs-and-in-ocaml-2oma
+-https://www.developpez.net/forums/d1022973/applications/developpement-2d-3d-jeux/ocaml-jeux-videos/

@@ -1,0 +1,212 @@
+const obstnum = 10
+const trafnum = 6
+const itinum = 50
+type color = { red: int; green: int; blue: int }
+type colorQ = Red|Green|Amber|Other
+type position = { x: float; y: float }
+type interrupt = Wait|Halt|Ok
+type status = Preparing|Running|Arrived|Stopped
+type event =
+  { lightRun: bool;
+    speedExcess: bool;
+    exitRoad: bool;
+    collisionEvent: bool;
+    dirEvent: bool }
+type obstacle = { o_pos: position; o_pres: bool }
+type obstacles = obstacle^obstnum
+type traflight = { tl_pos: position; tl_color: colorQ }
+type traflights = traflight^trafnum
+type sign = { si_tlights: traflights; si_obstacles: obstacles }
+type phase = { ph_pos: position; ph_vel: float; ph_head: float }
+type sensors = { s_road: color; s_front: color; s_sonar: int }
+type action = Go|Turn|Stop
+type itielt = { act: action; param: float }
+type itielts = itielt^itinum
+type wheels = { left: float; right: float }
+type map_data =
+  { on_road: bool;
+    color: color;
+    max_speed: int;
+    tl_number: int;
+    tl_required: bool;
+    dir_x: float;
+    dir_y: float }
+type param_obst = { pot_pos: position; pot_since: float; pot_till: float }
+type param_obsts = param_obst^obstnum
+type param_tlight =
+  { ptl_pos: position;
+    ptl_green: int;
+    ptl_amber: int;
+    ptl_red: int;
+    ptl_phase: int }
+type param_tlights = param_tlight^trafnum
+const pi = 3.141593
+const red = { red = 255; green = 0; blue = 0 }
+const green = { red = 0; green = 255; blue = 0 }
+const blue = { red = 0; green = 0; blue = 255 }
+const amber = { red = 255; green = 191; blue = 0 }
+const cyan = { red = 0; green = 255; blue = 255 }
+const gray = { red = 128; green = 128; blue = 128 }
+const magenta = { red = 255; green = 0; blue = 255 }
+const cB = 6.000000
+const cD = 5.500000
+const cDELTA = 0.000000
+const cMAXWHEEL = 500.000000
+const cMAXSPEED = 25.000000
+const cSONARFAR = 1000
+const cROBST = 1.500000
+const cSA = 3.000000
+const cSB = 3.000000
+const cSC = 7.000000
+const idlew = { left = 0.000000; right = 0.000000 }
+const timestep = 0.010000
+node dbg_position(msg : string; p : position) returns 
+var w5 : Debug.world; w4 : Debug.world; w3 : Debug.world; w2 : Debug.world;
+    w1 : Debug.world; w0 : Debug.world; v : Debug.world;
+let
+  w5 = Debug.d_string(w4, " }\n");
+  w4 = Debug.d_float(w3, p.y);
+  w3 = Debug.d_string(w2, "; y = ");
+  w2 = Debug.d_float(w1, p.x);
+  w1 = Debug.d_string(w0, "{ x = ");
+  w0 = Debug.d_string(v, msg);
+  v = Debug.d_init()
+tel
+
+node dbg_phase(msg : string; ph : phase) returns 
+var w9 : Debug.world; w8 : Debug.world; w7 : Debug.world; w6 : Debug.world;
+    w5 : Debug.world; w4 : Debug.world; w3 : Debug.world; w2 : Debug.world;
+    w1 : Debug.world; w0 : Debug.world; v : Debug.world;
+let
+  w9 = Debug.d_string(w8, " }\n");
+  w8 = Debug.d_float(w7, ph.ph_vel);
+  w7 = Debug.d_string(w6, "; vel = ");
+  w6 = Debug.d_float(w5, ph.ph_head);
+  w5 = Debug.d_string(w4, "; head = ");
+  w4 = Debug.d_float(w3, ph.ph_pos.y);
+  w3 = Debug.d_string(w2, "; y = ");
+  w2 = Debug.d_float(w1, ph.ph_pos.x);
+  w1 = Debug.d_string(w0, "{ x = ");
+  w0 = Debug.d_string(v, msg);
+  v = Debug.d_init()
+tel
+
+node dbg_interrupt(msg : string; itr : interrupt) returns 
+var w2 : Debug.world; w1 : Debug.world; w0 : Debug.world; v : Debug.world;
+    ck : interrupt; w1_Wait : Debug.world; w1_Halt : Debug.world;
+    w1_Ok : Debug.world;
+let
+  w2 = Debug.d_string(w1, "\n");
+  ck = itr;
+  w1_Wait = Debug.d_string((w0 when Wait(ck)), "Wait");
+  w1_Halt = Debug.d_string((w0 when Halt(ck)), "Halt");
+  w1_Ok = Debug.d_string((w0 when Ok(ck)), "Ok");
+  w1 = merge ck (Ok -> w1_Ok)(Halt -> w1_Halt)(Wait -> w1_Wait);
+  w0 = Debug.d_string(v, msg);
+  v = Debug.d_init()
+tel
+
+node dbg_status(msg : string; sta : status) returns 
+var w2 : Debug.world; w1 : Debug.world; w0 : Debug.world; v : Debug.world;
+    ck : status; w1_Preparing : Debug.world; w1_Running : Debug.world;
+    w1_Arrived : Debug.world; w1_Stopped : Debug.world;
+let
+  w2 = Debug.d_string(w1, "\n");
+  ck = sta;
+  w1_Preparing = Debug.d_string((w0 when Preparing(ck)), "Preparing");
+  w1_Running = Debug.d_string((w0 when Running(ck)), "Running");
+  w1_Arrived = Debug.d_string((w0 when Arrived(ck)), "Arrived");
+  w1_Stopped = Debug.d_string((w0 when Stopped(ck)), "Stopped");
+  w1 =
+    merge ck
+      (Stopped -> w1_Stopped)(Arrived -> w1_Arrived)(Running -> w1_Running)
+      (Preparing -> w1_Preparing);
+  w0 = Debug.d_string(v, msg);
+  v = Debug.d_init()
+tel
+
+node dbg_wheels(msg : string; wh : wheels) returns 
+var w5 : Debug.world; w4 : Debug.world; w3 : Debug.world; w2 : Debug.world;
+    w1 : Debug.world; w0 : Debug.world; v : Debug.world;
+let
+  w5 = Debug.d_string(w4, " }\n");
+  w4 = Debug.d_float(w3, wh.right);
+  w3 = Debug.d_string(w2, "; right = ");
+  w2 = Debug.d_float(w1, wh.left);
+  w1 = Debug.d_string(w0, "{ left = ");
+  w0 = Debug.d_string(v, msg);
+  v = Debug.d_init()
+tel
+
+node dbg_action(msg : string; act : action) returns 
+var w2 : Debug.world; w1 : Debug.world; w0 : Debug.world; v : Debug.world;
+    ck : action; w1_Go : Debug.world; w1_Turn : Debug.world;
+    w1_Stop : Debug.world;
+let
+  w2 = Debug.d_string(w1, "\n");
+  ck = act;
+  w1_Go = Debug.d_string((w0 when Go(ck)), "Go");
+  w1_Turn = Debug.d_string((w0 when Turn(ck)), "Turn");
+  w1_Stop = Debug.d_string((w0 when Stop(ck)), "Stop");
+  w1 = merge ck (Stop -> w1_Stop)(Turn -> w1_Turn)(Go -> w1_Go);
+  w0 = Debug.d_string(v, msg);
+  v = Debug.d_init()
+tel
+
+node d_color(w0 : Debug.world; c : color) returns (w7 : Debug.world)
+var w6 : Debug.world; w5 : Debug.world; w4 : Debug.world; w3 : Debug.world;
+    w2 : Debug.world; w1 : Debug.world;
+let
+  w7 = Debug.d_string(w6, " }");
+  w6 = Debug.d_int(w5, c.blue);
+  w5 = Debug.d_string(w4, "; blue = ");
+  w4 = Debug.d_int(w3, c.green);
+  w3 = Debug.d_string(w2, "; green = ");
+  w2 = Debug.d_int(w1, c.red);
+  w1 = Debug.d_string(w0, "{ red = ")
+tel
+
+node dbg_color(msg : string; c : color) returns 
+var w2 : Debug.world; w1 : Debug.world; w0 : Debug.world; v : Debug.world;
+let
+  w2 = Debug.d_string(w1, "\n");
+  w1 = d_color(w0, c);
+  w0 = Debug.d_string(v, msg);
+  v = Debug.d_init()
+tel
+
+node dbg_colorq(msg : string; c : colorQ) returns 
+var w2 : Debug.world; w1 : Debug.world; w0 : Debug.world; v : Debug.world;
+    ck : colorQ; w1_Red : Debug.world; w1_Green : Debug.world;
+    w1_Amber : Debug.world; w1_Other : Debug.world;
+let
+  w2 = Debug.d_string(w1, "\n");
+  ck = c;
+  w1_Red = Debug.d_string((w0 when Red(ck)), "Red");
+  w1_Green = Debug.d_string((w0 when Green(ck)), "Green");
+  w1_Amber = Debug.d_string((w0 when Amber(ck)), "Amber");
+  w1_Other = Debug.d_string((w0 when Other(ck)), "Other");
+  w1 =
+    merge ck
+      (Other -> w1_Other)(Amber -> w1_Amber)(Green -> w1_Green)
+      (Red -> w1_Red);
+  w0 = Debug.d_string(v, msg);
+  v = Debug.d_init()
+tel
+
+node dbg_sensors(msg : string; s : sensors) returns 
+var w7 : Debug.world; w6 : Debug.world; w5 : Debug.world; w4 : Debug.world;
+    w3 : Debug.world; w2 : Debug.world; w1 : Debug.world; w0 : Debug.world;
+    v : Debug.world;
+let
+  w7 = Debug.d_string(w6, " }\n");
+  w6 = Debug.d_int(w5, s.s_sonar);
+  w5 = Debug.d_string(w4, "; s_sonar = ");
+  w4 = d_color(w3, s.s_front);
+  w3 = Debug.d_string(w2, "; s_front = ");
+  w2 = d_color(w1, s.s_road);
+  w1 = Debug.d_string(w0, "{ s_road = ");
+  w0 = Debug.d_string(v, msg);
+  v = Debug.d_init()
+tel
+

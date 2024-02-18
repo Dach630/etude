@@ -1,0 +1,275 @@
+open Globals
+open Mathext
+open Trace
+open Utilities
+type st = St_Turn|St_Stop|St_Go
+node vitesse_limit(limit : float) returns (vit : float)
+var v : float;
+let
+  vit = (v /. Globals.cMAXSPEED);
+  v = (Globals.cMAXWHEEL *. limit)
+tel
+
+node pid(err : float) returns (corr : float)
+var d : float; i : float; p : float; v : float; v_1 : float; v_2 : float;
+let
+  corr = (v_2 +. d);
+  v_2 = (p +. i);
+  d = (1.000000 *. v_1);
+  v_1 = Utilities.derivative(err, Globals.timestep);
+  i = (1.000000 *. v);
+  v = Utilities.integrator(err, Globals.timestep, 0.000000);
+  p = (1.000000 *. err)
+tel
+
+node correction_left(sens : Globals.sensors; limit : float)
+returns (left : float)
+var tmp : float; v : float; v_3 : bool; v_4 : bool; v_5 : bool; v_6 : float;
+    v_7 : float; v_8 : float; v_9 : bool;
+let
+  left = if v_9 then 0.000000 else tmp;
+  v_9 = (tmp <. 0.000000);
+  tmp = (v -. v_8);
+  v_8 = if v_5 then v_7 else 0.000000;
+  v_7 = pid(v_6);
+  v_6 = Mathext.float(sens.Globals.s_road.Globals.red);
+  v_5 = (v_3 & v_4);
+  v_4 = (sens.Globals.s_road.Globals.blue > 0);
+  v_3 = (sens.Globals.s_road.Globals.red > 0);
+  v = vitesse_limit(limit)
+tel
+
+node correction_right(sens : Globals.sensors; limit : float)
+returns (right : float)
+var tmp : float; v : float; v_10 : bool; v_11 : bool; v_12 : bool;
+    v_13 : float; v_14 : float; v_15 : float; v_16 : bool;
+let
+  right = if v_16 then 0.000000 else tmp;
+  v_16 = (tmp <. 0.000000);
+  tmp = (v -. v_15);
+  v_15 = if v_12 then v_14 else 0.000000;
+  v_14 = pid(v_13);
+  v_13 = Mathext.float(sens.Globals.s_road.Globals.green);
+  v_12 = (v_10 & v_11);
+  v_11 = (sens.Globals.s_road.Globals.blue > 0);
+  v_10 = (sens.Globals.s_road.Globals.green > 0);
+  v = vitesse_limit(limit)
+tel
+
+node is_colors_equals(c1 : Globals.color; c2 : Globals.color)
+returns (o : bool)
+var v : bool; v_17 : bool; v_18 : bool; v_19 : bool;
+let
+  o = (v_18 & v_19);
+  v_19 = (c1.Globals.blue = c2.Globals.blue);
+  v_18 = (v & v_17);
+  v_17 = (c1.Globals.green = c2.Globals.green);
+  v = (c1.Globals.red = c2.Globals.red)
+tel
+
+node nouvelle_etape(sens : Globals.sensors; tourne : bool)
+returns (nouv : bool)
+var tmp : Globals.color; v : bool; v_20 : bool; v_21 : bool; v_22 : bool;
+    v_23 : bool;
+let
+  nouv = (v_22 & v_23);
+  v_23 = not(tourne);
+  v_22 = (v & v_21);
+  v_21 = not(v_20);
+  v_20 = is_colors_equals(tmp, Globals.green);
+  v = is_colors_equals(sens.Globals.s_road, Globals.green);
+  tmp = Globals.blue fby sens.Globals.s_road
+tel
+
+node int_of_bool(b : bool) returns (i : int)
+let
+  i = if b then 1 else 0
+tel
+
+node feu_tricolore(sens : Globals.sensors) returns (arret : bool)
+var v : bool; v_24 : bool; v_25 : bool; v_26 : bool;
+let
+  arret = (v & v_26);
+  v_26 = (v_24 or v_25);
+  v_25 = is_colors_equals(sens.Globals.s_front, Globals.amber);
+  v_24 = is_colors_equals(sens.Globals.s_front, Globals.red);
+  v = is_colors_equals(sens.Globals.s_road, Globals.red)
+tel
+
+node correction_vitesse_virage(left : float; right : float)
+returns (n_left : float; n_right : float)
+var v : bool; v_27 : bool; v_28 : float; v_29 : bool; v_30 : bool;
+    v_31 : float;
+let
+  n_right = if v_30 then v_31 else right;
+  v_31 = (right *. 0.750000);
+  v_30 = not(v_29);
+  v_29 = (left = right);
+  n_left = if v_27 then v_28 else left;
+  v_28 = (left *. 0.750000);
+  v_27 = not(v);
+  v = (left = right)
+tel
+
+node rotation(degre : float; limit : float)
+returns (temps_rotation : float; roue : Globals.wheels)
+var distance_rotation : float; perimetre_tour : float; v : bool;
+    v_32 : float; v_33 : float; v_34 : float; v_35 : bool; v_36 : float;
+    v_37 : Globals.wheels; v_38 : float; v_39 : Globals.wheels;
+let
+  roue = if v_35 then v_37 else v_39;
+  v_39 = { Globals.left = v_38; Globals.right = 0.000000 };
+  v_38 = vitesse_limit(limit);
+  v_37 = { Globals.left = 0.000000; Globals.right = v_36 };
+  v_36 = vitesse_limit(limit);
+  v_35 = (degre >. 0.000000);
+  temps_rotation = (distance_rotation /. limit);
+  distance_rotation = (v_34 /. 360.000000);
+  v_34 = (perimetre_tour *. v_33);
+  v_33 = if v then degre else v_32;
+  v_32 = ~-.(degre);
+  v = (degre >. 0.000000);
+  perimetre_tour = ((2.000000 *. Globals.cB) *. Globals.pi)
+tel
+
+node controller(sens : Globals.sensors; iti : Globals.itielts)
+returns (rspeed : Globals.wheels; arriving : bool)
+var limit : float; a_tourner : bool; v_right : float; v_left : float;
+    itine : Globals.itielt; compteur_etape : int; rspeed_1 : Globals.wheels;
+    v_left_1 : float; v_right_1 : float; a_tourner_1 : bool; pnr : bool;
+    nr : bool; r : bool; ns : st; s : st; v : bool; v_40 : int; v_41 : int;
+    v_42 : int; v_43 : int; v_44 : Globals.itielt; v_45 : int; v_46 : bool;
+    v_47 : bool; v_48 : float; v_49 : float; ck_1 : st;
+    rspeed_St_Go : Globals.wheels; arriving_St_Go : bool;
+    v_left_St_Go : float; v_right_St_Go : float; a_tourner_St_Go : bool;
+    ns_St_Go : st; nr_St_Go : bool; rspeed_St_Turn : Globals.wheels;
+    arriving_St_Turn : bool; v_left_St_Turn : float; v_right_St_Turn : float;
+    a_tourner_St_Turn : bool; ns_St_Turn : st; nr_St_Turn : bool;
+    rspeed_St_Stop : Globals.wheels; arriving_St_Stop : bool;
+    v_left_St_Stop : float; v_right_St_Stop : float;
+    a_tourner_St_Stop : bool; ns_St_Stop : st; nr_St_Stop : bool; r_1 : bool;
+    r_2 : bool; v_66 : float; v_67 : float; v_68 : bool; v_69 : bool;
+    v_70 : bool; v_71 : Globals.wheels; v_72 : Globals.wheels;
+    roue : Globals.wheels; temps_total : float; temps_rotation : float;
+    temps_rotation_2 : float; v_58 : float; v_59 : float; v_60 : bool;
+    v_61 : float; v_62 : float; v_63 : Globals.wheels; v_64 : bool;
+    v_65 : bool; ck : st; s_St_Go : st; r_St_Go : bool; s_St_Turn : st;
+    r_St_Turn : bool; s_St_Stop : st; r_St_Stop : bool; v_54 : bool;
+    v_55 : bool; v_56 : st; v_57 : bool; v_50 : bool; v_51 : bool; v_52 : st;
+    v_53 : bool;
+let
+  a_tourner_1 = false fby a_tourner;
+  v_right_1 = 0.000000 fby v_right;
+  v_left_1 = 0.000000 fby v_left;
+  rspeed_1 = { Globals.left = 0.000000; Globals.right = 0.000000 } fby rspeed;
+  pnr = false fby nr;
+  ck_1 = s;
+  rspeed_St_Go = if v_70 then v_71 else v_72;
+  v_72 =
+    { Globals.left = 
+      (v_left when St_Go(ck_1));
+      Globals.right = 
+      (v_right when St_Go(ck_1)) };
+  v_71 = { Globals.left = 0.000000; Globals.right = 0.000000 };
+  v_70 = (v_68 or v_69);
+  v_69 = ((sens when St_Go(ck_1)).Globals.s_sonar < 1000);
+  v_68 = feu_tricolore((sens when St_Go(ck_1)));
+  (v_left_St_Go, v_right_St_Go) = correction_vitesse_virage(v_66, v_67);
+  v_67 =
+    correction_right((sens when St_Go(ck_1)), (limit when St_Go(ck_1)))
+       every r_2;
+  v_66 =
+    correction_left((sens when St_Go(ck_1)), (limit when St_Go(ck_1)))
+       every r_1;
+  a_tourner_St_Go = false;
+  arriving_St_Go = false;
+  nr_St_Go = false;
+  ns_St_Go = St_Go;
+  r_1 = (r when St_Go(ck_1));
+  r_2 = (r when St_Go(ck_1));
+  temps_rotation_2 = pre temps_rotation;
+  v_right_St_Turn = (v_right_1 when St_Turn(ck_1));
+  v_left_St_Turn = (v_left_1 when St_Turn(ck_1));
+  a_tourner_St_Turn = (v_64 & v_65);
+  v_65 = (temps_rotation >. temps_total);
+  v_64 = ((a_tourner_1 when St_Turn(ck_1)) = false);
+  rspeed_St_Turn = if v_60 then roue else v_63;
+  v_63 = { Globals.left = v_61; Globals.right = v_62 };
+  v_62 = vitesse_limit((limit when St_Turn(ck_1)));
+  v_61 = vitesse_limit((limit when St_Turn(ck_1)));
+  v_60 = (temps_rotation <. temps_total);
+  temps_rotation = (v_59 +. Globals.timestep);
+  v_59 = if (r when St_Turn(ck_1)) then 0.000000 else v_58;
+  v_58 = 0.000000 fby temps_rotation;
+  (temps_total, roue) =
+    rotation
+    ((itine when St_Turn(ck_1)).Globals.param, (limit when St_Turn(ck_1)));
+  arriving_St_Turn = false;
+  nr_St_Turn = false;
+  ns_St_Turn = St_Turn;
+  a_tourner_St_Stop = (a_tourner_1 when St_Stop(ck_1));
+  v_right_St_Stop = (v_right_1 when St_Stop(ck_1));
+  v_left_St_Stop = (v_left_1 when St_Stop(ck_1));
+  rspeed_St_Stop = (rspeed_1 when St_Stop(ck_1));
+  arriving_St_Stop = true;
+  nr_St_Stop = false;
+  ns_St_Stop = St_Stop;
+  rspeed =
+    merge ck_1
+      (St_Stop -> rspeed_St_Stop)(St_Turn -> rspeed_St_Turn)
+      (St_Go -> rspeed_St_Go);
+  arriving =
+    merge ck_1
+      (St_Stop -> arriving_St_Stop)(St_Turn -> arriving_St_Turn)
+      (St_Go -> arriving_St_Go);
+  v_left =
+    merge ck_1
+      (St_Stop -> v_left_St_Stop)(St_Turn -> v_left_St_Turn)
+      (St_Go -> v_left_St_Go);
+  v_right =
+    merge ck_1
+      (St_Stop -> v_right_St_Stop)(St_Turn -> v_right_St_Turn)
+      (St_Go -> v_right_St_Go);
+  a_tourner =
+    merge ck_1
+      (St_Stop -> a_tourner_St_Stop)(St_Turn -> a_tourner_St_Turn)
+      (St_Go -> a_tourner_St_Go);
+  ns =
+    merge ck_1
+      (St_Stop -> ns_St_Stop)(St_Turn -> ns_St_Turn)(St_Go -> ns_St_Go);
+  nr =
+    merge ck_1
+      (St_Stop -> nr_St_Stop)(St_Turn -> nr_St_Turn)(St_Go -> nr_St_Go);
+  ck = St_Go fby ns;
+  r_St_Go = if v_54 then true else v_57;
+  s_St_Go = if v_54 then St_Turn else v_56;
+  v_57 = if v_55 then true else (pnr when St_Go(ck));
+  v_56 = if v_55 then St_Stop else St_Go;
+  v_55 = ((itine when St_Go(ck)).Globals.act = Globals.Stop);
+  v_54 = ((itine when St_Go(ck)).Globals.act = Globals.Turn);
+  r_St_Turn = if v_50 then true else v_53;
+  s_St_Turn = if v_50 then St_Go else v_52;
+  v_53 = if v_51 then true else (pnr when St_Turn(ck));
+  v_52 = if v_51 then St_Stop else St_Turn;
+  v_51 = ((itine when St_Turn(ck)).Globals.act = Globals.Stop);
+  v_50 = ((itine when St_Turn(ck)).Globals.act = Globals.Go);
+  r_St_Stop = (pnr when St_Stop(ck));
+  s_St_Stop = St_Stop;
+  s = merge ck (St_Stop -> s_St_Stop)(St_Turn -> s_St_Turn)(St_Go -> s_St_Go);
+  r = merge ck (St_Stop -> r_St_Stop)(St_Turn -> r_St_Turn)(St_Go -> r_St_Go);
+  limit = if v_46 then itine.Globals.param else v_49;
+  v_49 = pre v_48;
+  v_48 = if v_47 then itine.Globals.param else limit;
+  v_47 = (itine.Globals.act = Globals.Go);
+  v_46 = true fby false;
+  itine = iti[v_45] default v_44;
+  v_45 = (compteur_etape % Globals.itinum);
+  v_44 = { Globals.act = Globals.Go; Globals.param = 0.000000 };
+  compteur_etape = 0 fby v_43;
+  v_43 = (v_41 + v_42);
+  v_42 = int_of_bool(a_tourner_1);
+  v_41 = (compteur_etape + v_40);
+  v_40 = int_of_bool(v);
+  v = nouvelle_etape(sens, a_tourner_1)
+tel
+

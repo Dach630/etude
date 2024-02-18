@@ -1,0 +1,8 @@
+lib: [
+  "_build/install/default/lib/ZeldaServeur/META"
+  "_build/install/default/lib/ZeldaServeur/dune-package"
+  "_build/install/default/lib/ZeldaServeur/opam"
+]
+bin: [
+  "_build/install/default/bin/ZeldaServeur"
+]

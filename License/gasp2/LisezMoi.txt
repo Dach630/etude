@@ -1,0 +1,29 @@
+Membres : 
+Daniel Cheng
+Gaspard Romele
+
+Groupe : 
+AO
+
+Pour compiler et exécuter notre programme, il suffit de faire la 
+commande "make" dans un terminal qui se situe dans le dossier source du
+code.
+
+Nous avons fait et compléter un analyseur lexical et syntaxique 
+en ocamllex, un interpréteur qui exécute un mot donné sur un automate,
+la gestion des erreurs et la seconde partie du sujet.
+Nous avons fait en partie mais n'avons pas pu finir avant la fin du 
+temps donné la construction d'un arbre à partir d'un programme à pile 
+donnée, l'analyse grammaticale en menhir, le fait de prendre un mot 
+du terminal et l'implémentation de la syntaxe alternative des automates
+.
+Au début de ce projet, Daniel a décidé qu'il ferait l'analyseur lexical
+et syntaxique, tandis que Gaspard ferait l'interpréteur et la 
+construction de l'arbre. Après avoir fini l'analyseur, Daniel a fait 
+la seconde partie du projet et a commencé la troisième. Vers la fin, 
+Daniel a aidé Gaspard avec les difficultés qu'il avait avec la 
+construction de l'arbre et Gaspard a travaillé sur la syntaxe 
+alternative.
+
+Le dossier "tentatives" contient les programmes qui ne fonctionnent pas et que 
+nous n'avont pas pu finir à temps

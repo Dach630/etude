@@ -1,0 +1,58 @@
+(Identifiants)
+CHENG, Daniel, @chengd, 21954618
+MUKAILA ALH SHITTU, abdoul basti, @mukailaa, 22024114
+
+
+
+(Fonctionnalités)
+Pour le Read.
+Il y a la fonction auxiliaire dans le read sont là pour faire des split_on_char ' ' sur chaque ligne.
+Retire les lignes vides, compte les indentations de la ligne et renvoie (nombre d'indentation, split_on_char ' ' de la ligne).
+Le lineExpr et lineCond transforme un string list en expr ou cond.
+Le onlyhead sert à vérifier si la liste a un seul élément, si c'est le cas renvoie l’élément.
+Le noHd sert à renvoyer la list sans son 1er élément
+Le linesBlock,linesIf, linesWhile font le program tout en permettant de toujours continuer la lecture fichier
+
+Pour le print le expStr et condStr renvoie le string de l'expr de de cond.
+Et inclut une fonction récursive pour afficher le polish.
+
+Pour l'évaluation, on utilise le eval_expr pour nous donner le résultat de l'expression.
+Le eval_block permet de garder une lecture continue du program tout en gardant la liste des variables.
+Le eval_instr exécute l'instruction et renvoie la liste des variables.
+
+La simplification simplifie le programme en simplifiant les expressions dans, et les conditions.
+Retire les parties morts du code selon si la condition simplifier peut donner true ou false.
+
+Le vars transporte un tableau de variable et le met à jour a chaque nouvelle variable rencontrer.
+Pour les boucles le programme fait une map temporaire avant de les ajouter au tableau final.
+(ne marche pas entèrement)
+(Les variables qui sont initialiser dans une partie if ou else ou initialiser dans le while restent initiliser)
+
+La fonction prog_polish affiche la version convertie du fichier polish.
+
+
+
+(Compilation et exécution)
+Il suffit de télécharger le master et dans le dossier faire la commande make.
+Ensuite utiliser la commande ./run option [fichier].
+Les options sont :
+-reprint pour afficher le fichier polish,
+-eval pour l'exécuter,
+-simpl afficher une version simplifier,
+-vars affiche les variables selon leur initialisation
+et -prog affiche le programme converti utiliser pour les autres options
+(Découpage modulaire)
+Le Type.ml possède tous les types utiliser dans le programme et est donc indispensable dans tous les programmes.
+On a divisé le programme selon les options du programme, et le fichier polish.ml ne contient que la main et le usage.
+
+
+
+(Organisation du travail)
+On a commencé par répartir les fonctions les plus compliquées en premier.
+Daniel fait le Read et Abdoul fait le Eval.
+Ensuite, si on avait fini, on faisait les autres fonctions restantes.
+Daniel a fait le print et le usage.
+Daniel a continué à travailler sur les options simpl et vars.
+Il a aussi ajouté l'option prog pour afficher la conversion du fichier polish en program.
+Et a modifié l'usage et le main.
+Abdoul faisait quelques corrections d'erreur.

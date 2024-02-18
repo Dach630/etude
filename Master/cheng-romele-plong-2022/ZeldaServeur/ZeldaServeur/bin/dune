@@ -1,0 +1,4 @@
+(executable
+ (public_name ZeldaServeur)
+ (name main)
+ (libraries ZeldaServeur lablgtk3 unix))

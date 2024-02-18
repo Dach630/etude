@@ -1,0 +1,24 @@
+id_navire,type,categorie,nationalite,vol_marchandises_max,nb_passagers_max
+1, Cargos polyvalents, 3, Chine, 20, 35
+2, Cargos polyvalents, 2, France, 15, 25
+3, Cargos polyvalents, 2, Allemagne, 15, 25
+4, Cargos polyvalents, 2, Japon, 15, 25
+5, Cargos polyvalents, 1, Brésil, 10, 25
+6, Cargos polyvalents, 3, Etats-Unis ,20 ,35
+7, Cargos polyvalents ,3 , Corée du Sud,20 ,35
+8, Cargos polyvalents ,3 , Espagne ,20 ,35
+9, Porte-conteneurs ,3 , Brésil ,50 ,20
+10, Porte-conteneurs ,4 , Chine ,50 ,20
+11, Porte-conteneurs ,3 , France ,40 ,15
+12, Porte-conteneurs ,2 , Allemagne,30 ,10
+13, Porte-conteneurs,4 , Etats-Unis ,50 ,20
+14, Navires frigorifiques ,2 , Etats-Unis ,15 ,20
+15, Navires frigorifiques ,1 , Italie ,10 ,15
+16, Navires frigorifiques ,3 , Chine ,20 ,25
+17, Navires frigorifiques ,2 , Argentine ,15 ,20
+18, Pétroliers ,4 , Chine ,40 ,35
+19, Pétroliers ,3 , Etats-Unis ,30 ,30
+20, Rouliers ,3 , Royaume-Uni ,20 ,50
+21, Rouliers ,2 , France ,15 ,40
+22, Rouliers ,1, Canada ,10 ,35
+23, Navire à double-action ,2 , Groenland ,15 ,20

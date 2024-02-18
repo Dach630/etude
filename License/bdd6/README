@@ -1,0 +1,9 @@
+Daniel Cheng 21954618
+Gaspard Romele 21950004
+
+Commencer par exécuter le fichier projet.sql qui contient le script créant les différents tableaux.
+Lancer ensuite remplissage.sql pour remplir ces tables.
+Projet_BD6.pdf est notre modélisation finale.
+Le fichier contraintes.sql contient l'ensemble des assertions SQL permettant la création de contraintes prenant plusieurs tableaux.
+Le fichier req.sql contient les 20 requêtes que nous avons imaginés pour ce sujet.
+Le fichier contraintes.sql contient l'ensemble des assertions SQL permettant la création de contraintes prenant plusieurs tableaux.

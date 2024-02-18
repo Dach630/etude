@@ -1,0 +1,10 @@
+Client: 
+    -envoie des inputs (specifique) de clavier vers le serveur
+    -reçoit image et son du serveur
+    
+Serveur:
+    -reçoit input du client 
+    -tradution input en resultat image et son
+    -envoie image et son au client
+    
+Librairie d'image : spriters-resource.com/nes/legendofzelda/

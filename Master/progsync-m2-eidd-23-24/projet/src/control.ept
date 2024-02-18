@@ -1,0 +1,151 @@
+open Globals
+open Mathext
+open Trace
+open Utilities
+
+node vitesse_limit (limit: float)
+	returns (vit : float)
+let
+	vit = (cMAXWHEEL *. limit)/.cMAXSPEED;
+tel
+
+
+node pid(err : float)
+	returns(corr : float)
+var p, i, d : float;
+let 
+	p = (1.0 *. err);
+	i = (1.0 *. integrator(err, timestep, 0.0));
+	d = (1.0 *. derivative(err, timestep));
+	corr = p +. i +. d;
+tel
+
+node correction_left(sens: sensors; limit: float) 
+	returns (left : float)
+var tmp : float;
+let
+	tmp = vitesse_limit (limit) -.
+		if (sens.s_road.red > 0 and sens.s_road.blue > 0) then 
+			pid(float(sens.s_road.red)) 
+		else
+	    		0.0;
+	left = 	if tmp <. 0.0 then 
+			0.0 
+		else 
+			tmp;
+tel
+
+
+
+node correction_right(sens : sensors; limit: float) 
+	returns (right : float)
+var tmp : float;
+let
+	tmp = vitesse_limit (limit)-.
+		if (sens.s_road.green > 0 and sens.s_road.blue > 0) 
+			then pid(float(sens.s_road.green)) 
+		else
+	    		0.0;
+	right = if tmp <. 0.0 then 
+			0.0 
+		else 
+			tmp;
+tel
+
+
+
+fun is_colors_equals(c1, c2 : color)
+    returns (o : bool)
+let
+	o = 	c1.red = c2.red and 
+		c1.green = c2.green and 
+		c1.blue = c2.blue;
+tel
+
+
+
+node nouvelle_etape(sens : sensors; tourne : bool) 
+    returns (nouv : bool)
+var tmp : color;
+let
+	tmp = blue fby sens.s_road;
+	nouv = 	is_colors_equals(sens.s_road, green) and 
+		not is_colors_equals(tmp, green) and 
+		not tourne;
+tel
+
+
+
+fun int_of_bool(b : bool)
+    returns (i : int)
+let
+	i = 	if b then 
+			1 
+		else 
+			0;
+tel
+
+node feu_tricolore(sens : sensors)
+    returns (arret : bool)
+let
+	arret = is_colors_equals(sens.s_road,red) and
+	      	(is_colors_equals(sens.s_front,red) or
+	      	is_colors_equals(sens.s_front,amber));
+tel
+
+(*on diminue la vitesse pincipalement pour les virage*)
+fun correction_vitesse_virage(left, right : float) returns (n_left,n_right : float)
+let
+	n_left = if left <> right then 
+			left *. 0.75 
+		else 
+			left;
+	n_right = if left <> right then 
+			right *. 0.75 
+		else 
+			right;
+tel
+
+fun rotation(degre, limit : float)
+    	returns (temps_rotation : float; roue : wheels)
+var perimetre_tour, distance_rotation : float;
+let
+	perimetre_tour = 2.0 *. cB *. pi;
+	distance_rotation = perimetre_tour *. (if degre >. 0.0 then degre else -.degre) /. 360.0;
+	temps_rotation = distance_rotation /. limit;
+	roue = if degre >. 0.0 then 
+			{left = 0.0; right = vitesse_limit(limit)} 
+		else 
+			{left = vitesse_limit(limit); right = 0.0};
+tel
+
+node controller(sens : sensors; iti : itielts)
+       returns (last rspeed : wheels = {left = 0.0; right = 0.0}; arriving : bool)
+var compteur_etape : int; itine : itielt; last a_tourner : bool = false; limit : float;
+let
+	compteur_etape = 0 fby (compteur_etape + int_of_bool(nouvelle_etape(sens,last a_tourner)) + int_of_bool(last a_tourner));
+	itine = iti.[compteur_etape % itinum] default { act = Go ; param = 0.0};
+	limit = itine.param fby (if itine.act = Go then itine.param else limit);
+
+	automaton
+		state Go
+		      var v_left,v_right : float;
+		      do arriving = false;
+		        	a_tourner = false;
+		      		(v_left, v_right) = correction_vitesse_virage(correction_left(sens, limit), correction_right(sens, limit));
+				rspeed = if feu_tricolore(sens) or sens.s_sonar < 1000 then {left = 0.0 ; right = 0.0} else { left = v_left; right = v_right};
+		      	unless itine.act = Turn then Turn | itine.act = Stop then Stop
+		state Turn
+		      var last temps_rotation : float; temps_total : float; roue : wheels;
+		      do arriving = false;
+		      		(temps_total, roue) = rotation(itine.param, limit);
+			    	temps_rotation = 0.0 fby temps_rotation +. timestep;
+			    	rspeed = if temps_rotation <. temps_total then roue else {left = vitesse_limit(limit); right = vitesse_limit(limit)};
+			    	a_tourner = last a_tourner = false and temps_rotation >. temps_total;
+		      unless itine.act = Go then Go | itine.act = Stop then Stop
+		state Stop
+		      do arriving = true;
+	end;
+
+tel
+
