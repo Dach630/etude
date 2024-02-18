@@ -1,0 +1,39 @@
+Ce que l'on doit faire:
+
+Le circuit:
+    -Trouver un moyen de transformer un fichier ppm en un circuit
+    -Créer des circuits qui peuvent être complétés
+
+Le véhicule:
+    -A chaque déplacement, on affiche un carré de 3*3 cases indiquant les directions et vitesses que le joueur peut choisir.
+    -Faire une voiture dont la direction et la vitesse changent selon les instructions du joueur.
+    -Lorsque le joueur cogne un mur, il est ramené en arrière(sa dernière position)et perd sa vitesse.
+
+L’IA:
+    -Créer un algorithme pour que des joueurs artificiels puissent naviguer sur le circuit. (Chaque véhicule doit avoir un algorithme différent)
+ 	-Trouver un moyen pour jouer au jeu dans le terminal. 
+
+Ajouts qu’on pourrait faire :
+
+Véhicule:
+    -Lorsqu'il arrive, le véhicule s'arrête complètement.
+    -Mettre en place un système de collision pour les véhicules.
+    -.Mettre des bonus sur la piste qui va améliorer la maniabilitée du véhicule(agrandir le carré de déplacement).
+
+Joueur:
+    -Faire un système qui sauvegarde les données d'un utilisateur(pseudo, meilleur temps sur chaque circuit...)
+    -Faire un système de classement pour chaque partie, selon leur place dans le classement les joueurs reçoivent un nombre plus ou moins grand de points.
+    -Faire un mode course contre la montre
+
+Options supplémentaires:
+	-Faire une interface visuelle.
+        ->Permettre au joueur de choisir la couleur de son véhicule
+        ->Faire de l’animation
+	-Replay de la course
+
+Classes envisagée:Circuit.java, Voiture.java, Joueur.java, Mur.java, Départ.java, Arrivée.java, Jeu.java, (Bonus.java, Timer.java)
+
+Questions:
+	
+-taille circuit dans le terminal maximal
+-afficher dans le terminal
